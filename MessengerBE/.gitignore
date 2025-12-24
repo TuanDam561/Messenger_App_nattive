@@ -29,3 +29,5 @@ coverage/
 
 # Optional: Ignore package lock if you prefer yarn
 package-lock.json
+
+/src/generated/prisma
