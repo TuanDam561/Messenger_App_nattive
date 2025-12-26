@@ -1,0 +1,425 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  userId       String                     @id @default(uuid()) @map("UserID")
+  gmail        String                     @unique @map("Gmail")
+  phoneNumber  String                     @map("PhoneNumber")
+  familyName   String                     @map("Family_Name")
+  sureName     String                     @map("Sure_Name")
+  nickname     String?                    @map("Nickname")
+  birthday     DateTime                   @map("Birthday")
+  hashPassword String                     @map("HashPassword")
+  pinOtp       Int?                       @map("Pin_OTP")
+  isDelete     Boolean                    @default(false) @map("isDelete")
+  role         String                     @map("Role")
+  isOnline     Boolean                    @default(false) @map("IsOnline")
+  createdAt    DateTime                   @default(now()) @map("Create_Date")
+  updatedAt    DateTime                   @updatedAt @map("Update_Date")
+  
+  // Relations
+  conversationsAsFirst    Conversation[]  @relation("UserAsFirst")
+  conversationsAsSecond   Conversation[]  @relation("UserAsSecond")
+  sentMessages            Messenger[]     @relation("Sender")
+  receivedMessages        Messenger[]     @relation("Receiver")
+  storyReactions          StoryReaction[]
+  settings                Setting[]
+  notifications           Notification[]  @relation("UserNotifications")
+  madeNotifications       Notification[]  @relation("NotificationMaker")
+  stories                 Story[]
+  storyViews              StoryViewer[]
+  auditLogs               AuditLog[]
+  devices                 Device[]
+  friendsAsUser           Friend[]        @relation("UserFriends")
+  friendsAsFriend         Friend[]        @relation("FriendOf")
+  ownedGroups             GroupConversation[] @relation("GroupOwner")
+  groupMembers            GroupMember[]   @relation("Member")
+  invitedGroupMembers     GroupMember[]   @relation("Inviter")
+  groupMessages           GroupMessage[]
+  authenticationJWTs      Authentication_JWT[]
+  verifyCodes             Verify_Code[]
+  readGroupMessages       GMessenger_Read[]
+  
+  @@map("User")
+}
+
+model Conversation {
+  conversationId String      @id @default(uuid()) @map("Conversation_ID")
+  userIdFirst    String      @map("UserID_1st")
+  userIdSecond   String      @map("UserID_2nd")
+  pinConversation Boolean?   @default(false) @map("Pin_Conversation")
+  isDelete       Boolean     @default(false) @map("IsDelete")
+  createdAt      DateTime    @default(now()) @map("Create_Date")
+  updatedAt      DateTime    @updatedAt @map("Update_Date")
+  
+  // Relations
+  userFirst      User        @relation("UserAsFirst", fields: [userIdFirst], references: [userId])
+  userSecond     User        @relation("UserAsSecond", fields: [userIdSecond], references: [userId])
+  messages       Messenger[]
+  
+  @@map("Converstation")
+}
+
+model Messenger {
+  messId          String        @id @default(uuid()) @map("Mess_ID")
+  sendId          String        @map("SendID")
+  receiverId      String        @map("ReciverID")
+  content         String?       @map("Content")
+  isDelete        Boolean       @default(false) @map("IsDelete")
+  isRead          Boolean       @default(false) @map("IsRead")
+  replyStoryId    String?       @map("Reply_Story_ID")
+  conversationId  String        @map("Conversation_ID")
+  createdAt       DateTime      @default(now()) @map("Create_Date")
+  updatedAt       DateTime      @updatedAt @map("Update_Date")
+  
+  // Relations
+  sender          User          @relation("Sender", fields: [sendId], references: [userId])
+  receiver        User          @relation("Receiver", fields: [receiverId], references: [userId])
+  conversation    Conversation  @relation(fields: [conversationId], references: [conversationId])
+  replyStory      Story?        @relation(fields: [replyStoryId], references: [storyId])
+  media           Messenger_Media[]
+  reactions       Messenger_Reaction[]
+  
+  @@map("Messenger")
+}
+
+model Messenger_Media {
+  messMediaId     String    @id @default(uuid()) @map("MessMedia_ID")
+  messId          String    @map("Mess_ID")
+  urlMedia        String    @map("Url_Media")
+  isDelete        Boolean   @default(false) @map("IsDelete")
+  createdAt       DateTime  @default(now()) @map("Create_Date")
+  updatedAt       DateTime  @updatedAt @map("Update_Date")
+  
+  // Relations
+  messenger       Messenger @relation(fields: [messId], references: [messId])
+  
+  @@map("Messenger_Media")
+}
+
+model Messenger_Reaction {
+  messReactionId  String    @id @default(uuid()) @map("MessReaction_ID")
+  messId          String    @map("Mess_ID")
+  reaction        String    @map("Reaction")
+  isDelete        Boolean   @default(false) @map("IsDelete")
+  createdAt       DateTime  @default(now()) @map("Create_Date")
+  updatedAt       DateTime  @updatedAt @map("Update_Date")
+  
+  // Relations
+  messenger       Messenger @relation(fields: [messId], references: [messId])
+  
+  @@map("Messenger_Reaction")
+}
+
+model Notification {
+  notificationId      String   @id @default(uuid()) @map("Notification_ID")
+  userId             String   @map("UserID")
+  content            String   @map("Content")
+  isRead             Boolean  @default(false) @map("IsRead")
+  urlNotification    String?  @map("URL_Notification")
+  userMakeNotification String? @map("UserMake_Notification")
+  createdAt          DateTime @default(now()) @map("Create_Date")
+  updatedAt          DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  user               User     @relation("UserNotifications", fields: [userId], references: [userId])
+  notificationMaker  User?    @relation("NotificationMaker", fields: [userMakeNotification], references: [userId])
+  
+  @@map("Notification")
+}
+
+model Story {
+  storyId        String          @id @default(uuid()) @map("Story_ID")
+  userId         String          @map("UserID")
+  content        String          @map("Content")
+  urlMedia       String          @map("Url_Media")
+  isDelete       Boolean         @default(false) @map("IsDelete")
+  createdAt      DateTime        @default(now()) @map("Create_Date")
+  expiredDate    DateTime        @map("Expired_Date")
+  updatedAt      DateTime        @updatedAt @map("Update_Date")
+  
+  // Relations
+  user           User            @relation(fields: [userId], references: [userId])
+  storyReactions StoryReaction[]
+  storyViewers   StoryViewer[]
+  repliedMessages Messenger[]
+  
+  @@map("Story")
+}
+
+model StoryReaction {
+  storyViewerId  BigInt    @id @default(autoincrement()) @map("StoryViewer_ID")
+  storyId        String    @map("Story_ID")
+  userId         String    @map("UserID")
+  isDelete       Boolean   @default(false) @map("IsDelete")
+  createdAt      DateTime  @default(now()) @map("Create_Date")
+  updatedAt      DateTime  @updatedAt @map("Update_Date")
+  
+  // Relations
+  story          Story     @relation(fields: [storyId], references: [storyId])
+  user           User      @relation(fields: [userId], references: [userId])
+  
+  @@map("Story_Reaction")
+}
+
+model StoryViewer {
+  storyReactId   BigInt    @id @default(autoincrement()) @map("StoryReact_ID")
+  storyId        String    @map("Story_ID")
+  userId         String    @map("UserID")
+  isDelete       Boolean   @default(false) @map("IsDelete")
+  createdAt      DateTime  @default(now()) @map("Create_Date")
+  updatedAt      DateTime  @updatedAt @map("Update_Date")
+  
+  // Relations
+  story          Story     @relation(fields: [storyId], references: [storyId])
+  user           User      @relation(fields: [userId], references: [userId])
+  
+  @@map("Story_Viewer")
+}
+
+model Setting {
+  settingId           String   @id @default(uuid()) @map("Setting_ID")
+  userId             String   @map("UserID")
+  twoFA              Boolean  @default(false) @map("2FA")
+  privatePhoneNumber Boolean  @default(false) @map("Private_PhoneNumber")
+  privateProfile     String   @map("Private_Profile")
+  isSearchYou        Boolean  @default(true) @map("IsSearch_You")
+  isDelete           Boolean  @default(false) @map("IsDelete")
+  createdAt          DateTime @default(now()) @map("Create_Date")
+  updatedAt          DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  user               User     @relation(fields: [userId], references: [userId])
+  
+  @@map("Setting")
+}
+
+model Friend {
+  id              String   @id @default(uuid()) @map("ID")
+  friendId        String   @map("FriendID")
+  userId          String   @map("UserID")
+  status          String   @map("Status")
+  contentSend     String?  @map("Content_Send")
+  isDelete        Boolean  @default(false) @map("IsDelete")
+  isBlock         Boolean  @default(false) @map("IsBlock")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  startTime       BigInt   @map("Start_Time")
+  
+  // Relations
+  friend          User     @relation("UserFriends", fields: [friendId], references: [userId])
+  user            User     @relation("FriendOf", fields: [userId], references: [userId])
+  muteNotifications Mute_FriendNotification[]
+  
+  @@map("Friend")
+}
+
+model Mute_FriendNotification {
+  muteId          String   @id @default(uuid()) @map("Mute_ID")
+  id              String   @map("ID")
+  friendIdMute    String   @map("Friend_ID_Mute")
+  typeMute        String   @map("Type_Mute")
+  startTime       DateTime? @map("Start_Time")
+  endTime         DateTime? @map("End_Time")
+  isDelete        Boolean  @default(false) @map("IsDelete")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  friend          Friend   @relation(fields: [id], references: [id])
+  
+  @@map("Mute_FriendNotification")
+}
+
+model AuditLog {
+  id              String   @id @default(uuid()) @map("ID")
+  userId          String   @map("UserID")
+  action          String   @map("Action")
+  tableName       String   @map("Table_Name")
+  oldValue        String   @map("Old_Value")
+  newValue        String   @map("New_Value")
+  ipAddress       String   @map("IP_Address")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [userId])
+  
+  @@map("Audit_Log")
+}
+
+model Device {
+  deviceId        String   @id @default(uuid()) @map("Device_ID")
+  userId          String   @map("UserID")
+  deviceType      String   @map("Device_Type")
+  deviceName      String   @map("Device_Name")
+  osVersion       String   @map("OS_Version")
+  appVersion      String   @map("App_Version")
+  tokenDevice     String   @map("Token_Device")
+  isActive        Boolean  @default(true) @map("IsActive")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [userId])
+  
+  @@map("Device")
+}
+
+// Models từ file thứ 2
+model Authentication_JWT {
+  authJWTId       String   @id @default(uuid()) @map("Auth_JWT_ID")
+  contentToken    String   @map("Content_Token")
+  jwtToken        String   @map("JwtToken")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  expiredDate     DateTime @map("Expired_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  isUsed          Boolean  @default(false) @map("isUsed")
+  userId          String   @map("UserID")
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [userId])
+  refreshTokens   Authentication_RefreshToken[]
+  
+  @@map("Authentication_JWT")
+}
+
+model Authentication_RefreshToken {
+  authRefId       String   @id @default(uuid()) @map("Auth_Ref_ID")
+  contentToken    String   @map("Content_Token")
+  refreshToken    String   @map("Refesh_Token")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  expiredDate     DateTime @map("Expired_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  isUsed          Boolean  @default(false) @map("isUsed")
+  authJWTId       String   @map("Auth_JWT_ID")
+  
+  // Relations
+  authJWT         Authentication_JWT @relation(fields: [authJWTId], references: [authJWTId])
+  
+  @@map("Authentication_RefeshToken")
+}
+
+model Verify_Code {
+  codeId          String   @id @default(uuid()) @map("Code_ID")
+  content         String   @map("Content")
+  verifyCode      String   @map("Verify_Code")
+  isUsed          Boolean  @default(false) @map("isUsed")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  userId          String   @map("UserID")
+  
+  // Relations
+  user            User     @relation(fields: [userId], references: [userId])
+  
+  @@map("Verify_Code")
+}
+
+model GroupConversation {
+  groupId         String   @id @default(uuid()) @map("Group_ID")
+  ownerId         String   @map("Owner_ID")
+  nameGroup       String   @map("Name_Group")
+  description     String   @map("Description")
+  isDelete        Boolean  @default(false) @map("IsDelete")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  owner           User     @relation("GroupOwner", fields: [ownerId], references: [userId])
+  groupMembers    GroupMember[]
+  groupMessages   GroupMessage[]
+  
+  @@map("Group_Conversation")
+}
+
+model GroupMember {
+  gMemberId       String   @id @default(uuid()) @map("GMember_ID")
+  groupId         String   @map("Group_ID")
+  userId          String   @map("User_ID")
+  roleGroup       String   @map("Role_Group")
+  isDelete        Boolean  @default(false) @map("IsDelete")
+  memberInviteId  String   @map("MemberInvite_ID")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  group           GroupConversation @relation(fields: [groupId], references: [groupId])
+  user            User              @relation("Member", fields: [userId], references: [userId])
+  inviteBy        User              @relation("Inviter", fields: [memberInviteId], references: [userId])
+  
+  @@map("Group_Member")
+}
+
+model GroupMessage {
+  groupMessId     String   @id @default(uuid()) @map("GroupMess_ID")
+  groupId         String   @map("Group_ID")
+  sendId          String   @map("SendID")
+  content         String?  @map("Content")
+  isDelete        Boolean  @default(false) @map("IsDelete")
+  createdAt       DateTime @default(now()) @map("Create_Date")
+  updatedAt       DateTime @updatedAt @map("Update_Date")
+  
+  // Relations
+  group           GroupConversation  @relation(fields: [groupId], references: [groupId])
+  sender          User               @relation(fields: [sendId], references: [userId])
+  media           GMessenger_Media[]
+  reactions       GMessenger_Reaction[]
+  reads           GMessenger_Read[]
+  
+  @@map("Group_Messenger")
+}
+
+model GMessenger_Media {
+  messMediaId     String       @id @default(uuid()) @map("MessMedia_ID")
+  groupMessId     String       @map("GroupMess_ID")
+  urlMedia        String       @map("Url_Media")
+  isDelete        Boolean      @default(false) @map("IsDelete")
+  createdAt       DateTime     @default(now()) @map("Create_Date")
+  updatedAt       DateTime     @updatedAt @map("Update_Date")
+  
+  // Relations
+  groupMessage    GroupMessage @relation(fields: [groupMessId], references: [groupMessId])
+  
+  @@map("GMessenger_Media")
+}
+
+model GMessenger_Reaction {
+  messReactionId  String       @id @default(uuid()) @map("MessReaction_ID")
+  groupMessId     String       @map("GroupMess_ID")
+  reaction        String       @map("Reaction")
+  isDelete        Boolean      @default(false) @map("IsDelete")
+  createdAt       DateTime     @default(now()) @map("Create_Date")
+  updatedAt       DateTime     @updatedAt @map("Update_Date")
+  
+  // Relations
+  groupMessage    GroupMessage @relation(fields: [groupMessId], references: [groupMessId])
+  
+  @@map("GMessenger_Reaction")
+}
+
+model GMessenger_Read {
+  messReadId      String       @id @default(uuid()) @map("MessRead_ID")
+  groupMessId     String       @map("GroupMess_ID")
+  userIdRead      String       @map("UserID_Read")
+  isDelete        Boolean      @default(false) @map("IsDelete")
+  createdAt       DateTime     @default(now()) @map("Create_Date")
+  updatedAt       DateTime     @updatedAt @map("Update_Date")
+  
+  // Relations
+  groupMessage    GroupMessage @relation(fields: [groupMessId], references: [groupMessId])
+  user            User         @relation(fields: [userIdRead], references: [userId])
+  
+  @@map("GMessenger_Read")
+}
