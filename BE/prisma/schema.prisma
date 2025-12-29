@@ -160,7 +160,7 @@ model Story {
 }
 
 model StoryReaction {
-  storyViewerId  BigInt    @id @default(autoincrement()) @map("StoryViewer_ID")
+  storyViewerId  String    @id @default(uuid()) @map("StoryViewer_ID")
   storyId        String    @map("Story_ID")
   userId         String    @map("UserID")
   isDelete       Boolean   @default(false) @map("IsDelete")
@@ -175,7 +175,7 @@ model StoryReaction {
 }
 
 model StoryViewer {
-  storyReactId   BigInt    @id @default(autoincrement()) @map("StoryReact_ID")
+  storyReactId   String   @id @default(uuid()) @map("StoryReact_ID")
   storyId        String    @map("Story_ID")
   userId         String    @map("UserID")
   isDelete       Boolean   @default(false) @map("IsDelete")

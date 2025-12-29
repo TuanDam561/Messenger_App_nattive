@@ -1,6 +1,22 @@
--- AlterTable
-ALTER TABLE "User" ALTER COLUMN "isDelete" SET DEFAULT false,
-ALTER COLUMN "IsOnline" SET DEFAULT false;
+-- CreateTable
+CREATE TABLE "User" (
+    "UserID" TEXT NOT NULL,
+    "Gmail" TEXT NOT NULL,
+    "PhoneNumber" TEXT NOT NULL,
+    "Family_Name" TEXT NOT NULL,
+    "Sure_Name" TEXT NOT NULL,
+    "Nickname" TEXT,
+    "Birthday" TIMESTAMP(3) NOT NULL,
+    "HashPassword" TEXT NOT NULL,
+    "Pin_OTP" INTEGER,
+    "isDelete" BOOLEAN NOT NULL DEFAULT false,
+    "Role" TEXT NOT NULL,
+    "IsOnline" BOOLEAN NOT NULL DEFAULT false,
+    "Create_Date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "Update_Date" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("UserID")
+);
 
 -- CreateTable
 CREATE TABLE "Converstation" (
@@ -85,7 +101,7 @@ CREATE TABLE "Story" (
 
 -- CreateTable
 CREATE TABLE "Story_Reaction" (
-    "StoryViewer_ID" BIGSERIAL NOT NULL,
+    "StoryViewer_ID" TEXT NOT NULL,
     "Story_ID" TEXT NOT NULL,
     "UserID" TEXT NOT NULL,
     "IsDelete" BOOLEAN NOT NULL DEFAULT false,
@@ -97,7 +113,7 @@ CREATE TABLE "Story_Reaction" (
 
 -- CreateTable
 CREATE TABLE "Story_Viewer" (
-    "StoryReact_ID" BIGSERIAL NOT NULL,
+    "StoryReact_ID" TEXT NOT NULL,
     "Story_ID" TEXT NOT NULL,
     "UserID" TEXT NOT NULL,
     "IsDelete" BOOLEAN NOT NULL DEFAULT false,
@@ -300,6 +316,9 @@ CREATE TABLE "GMessenger_Read" (
 
     CONSTRAINT "GMessenger_Read_pkey" PRIMARY KEY ("MessRead_ID")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_Gmail_key" ON "User"("Gmail");
 
 -- AddForeignKey
 ALTER TABLE "Converstation" ADD CONSTRAINT "Converstation_UserID_1st_fkey" FOREIGN KEY ("UserID_1st") REFERENCES "User"("UserID") ON DELETE RESTRICT ON UPDATE CASCADE;
