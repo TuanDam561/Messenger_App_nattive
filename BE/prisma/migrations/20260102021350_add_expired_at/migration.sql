@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "IsVerify" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "Verify_Code" ADD COLUMN     "Expired_At" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

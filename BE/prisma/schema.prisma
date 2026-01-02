@@ -28,6 +28,7 @@ model User {
   isOnline     Boolean                    @default(false) @map("IsOnline")
   createdAt    DateTime                   @default(now()) @map("Create_Date")
   updatedAt    DateTime                   @updatedAt @map("Update_Date")
+  isVerify     Boolean                    @default(false) @map("IsVerify")
   
   // Relations
   conversationsAsFirst    Conversation[]  @relation("UserAsFirst")
@@ -320,6 +321,8 @@ model Verify_Code {
   createdAt       DateTime @default(now()) @map("Create_Date")
   updatedAt       DateTime @updatedAt @map("Update_Date")
   userId          String   @map("UserID")
+  expiredAt       DateTime @map("Expired_At") @default(now())
+
   
   // Relations
   user            User     @relation(fields: [userId], references: [userId])
