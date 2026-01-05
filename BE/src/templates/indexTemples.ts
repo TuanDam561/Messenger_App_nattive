@@ -1,5 +1,5 @@
-import { registerTemplate } from "./registerTemplates";
-import { resetPasswordTemplate } from "./resetPasswordTemplates";
+import { registerTemplate } from "@templates/registerTemplates";
+import { resetPasswordTemplate } from "@templates/resetPasswordTemplates";
 
 export type MailTemplateType = "REGISTER" | "RESET_PASSWORD";
 

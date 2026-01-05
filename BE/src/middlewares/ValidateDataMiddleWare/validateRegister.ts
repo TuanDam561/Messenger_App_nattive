@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../../shared/appError";
-import { RegisterDTO } from "../../dtos/authDTO";
+import { AppError } from "@shared/appError";
+import { RegisterDTO } from "@dtos/authDTO";
 
 export function validateRegisterDTO(
   req: Request,

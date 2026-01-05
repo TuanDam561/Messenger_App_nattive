@@ -1,10 +1,40 @@
+// {
+//   "compilerOptions": {
+//     "module": "ESNext",
+//     "moduleResolution": "node",
+//     "target": "ES2023",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "ignoreDeprecations": "5.0"
+//   }
+// }
+
 {
   "compilerOptions": {
+    "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "node",
-    "target": "ES2023",
     "strict": true,
     "esModuleInterop": true,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+
+    "baseUrl": "./src",
+    "paths": {
+      "@prisma/*": ["../generated/prisma/*"],
+      "@configs/*": ["configs/*"],
+      "@controllers/*": ["controllers/*"],
+      "@dtos/*": ["dtos/*"],
+      "@interfaces/*": ["interface/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@modules/*": ["modules/*"],
+      "@providers/*": ["providers/*"],
+      "@repository/*": ["repository/*"],
+      "@routers/*": ["routers/*"],
+      "@services/*": ["services/*"],
+      "@shared/*": ["shared/*"],
+      "@templates/*": ["templates/*"],
+      "@utils/*": ["utils/*"],
+      "@app_types/*": ["types/*"]
+    }
   }
 }

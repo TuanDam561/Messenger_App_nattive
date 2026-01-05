@@ -1,5 +1,5 @@
-import { Verify_Code } from "../../generated/prisma/client";
-import { CreateMailDTO, VerifyMailDTO } from "../dtos/mailDTO";
+import { Verify_Code } from "@prisma/client";
+import { CreateMailDTO, VerifyMailDTO } from "@dtos/mailDTO";
 
 export interface VerifyMailRepository {
   create(data: CreateMailDTO): Promise<Verify_Code>;

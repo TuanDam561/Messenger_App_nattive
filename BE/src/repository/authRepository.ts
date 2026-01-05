@@ -1,6 +1,6 @@
-import { prisma, Prisma } from "../configs/prisma";
-import { IAuthRepository } from "../interface/IAuthRepository ";
-import { RegisterDTO } from "../dtos/authDTO";
+import { prisma, Prisma } from "@configs/prisma";
+import { IAuthRepository } from "@interfaces/Auth/IAuthRepository ";
+import { RegisterDTO } from "@dtos/authDTO";
 type User = Prisma.UserModel; //Gọi model ra từ Prisma Client
 export class AuthRepository implements IAuthRepository {
   async findByEmail(email: string): Promise<User | null> {

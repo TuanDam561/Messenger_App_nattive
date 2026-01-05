@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { MailProvider, MailPayload } from "../interface/IMailProvider";
+import { MailProvider, MailPayload } from "@interfaces/Mail/IMailProvider";
 
 export class NodemailerMailProvider implements MailProvider {
   private transporter;

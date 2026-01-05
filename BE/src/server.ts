@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
-import routerMiddlewares from "./middlewares/routerMiddlewares";
-import { errorHandler } from "./middlewares/errorHandler";
+import routerMiddlewares from "@middlewares/routerMiddlewares";
+import { errorHandler } from "@middlewares/errorHandler";
 
 dotenv.config();
 

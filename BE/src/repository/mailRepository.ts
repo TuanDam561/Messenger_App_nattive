@@ -1,6 +1,6 @@
-import { prisma, Prisma } from "../configs/prisma";
-import { VerifyMailRepository } from "../interface/IMailRepository";
-import { CreateMailDTO, VerifyMailDTO } from "../dtos/mailDTO";
+import { prisma, Prisma } from "@configs/prisma";
+import { VerifyMailRepository } from "@interfaces/Mail/IMailRepository";
+import { CreateMailDTO, VerifyMailDTO } from "@dtos/mailDTO";
 type VerificationCode = Prisma.Verify_CodeModel; //Gọi model ra từ Prisma Client
 
 export class PrismaVerifyMailRepository implements VerifyMailRepository {

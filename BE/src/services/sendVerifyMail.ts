@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import { VerifyMailRepository } from "../interface/IMailRepository";
-import { MailProvider } from "../interface/IMailProvider";
-import { mailTemplates, MailTemplateType } from "../templates/indexTemples";
+import { VerifyMailRepository } from "@interfaces/Mail/IMailRepository";
+import { MailProvider } from "@interfaces/Mail/IMailProvider";
+import { mailTemplates, MailTemplateType } from "@templates/indexTemples";
 
 interface SendVerifyMailParams {
   userId: string;

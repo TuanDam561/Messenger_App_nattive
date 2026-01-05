@@ -1,6 +1,6 @@
 // middlewares/errorHandler.ts
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../shared/appError";
+import { AppError } from "@shared/appError";
 
 export function errorHandler(
   err: any,
