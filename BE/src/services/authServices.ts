@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from "@utils/hashPassword";
 import { IAuthRepository } from "@interfaces/Auth/IAuthRepository ";
 import { ITokenService } from "@interfaces/Token/ITokenService";
 import { VerifyMailService } from "@services/sendVerifyMail";
+import { AppError } from "@shared/appError";
 
 export class AuthService {
   constructor(
@@ -15,7 +16,7 @@ export class AuthService {
   async register(data: RegisterDTO): Promise<RegisterResponse> {
     const existingUser = await this.repo.findByEmail(data.email);
     if (existingUser) {
-      throw new Error("Email đã tồn tại");
+      throw AppError.conflict("Email đã tồn tại");
     }
 
     const user = await this.repo.createUser({
@@ -50,15 +51,29 @@ export class AuthService {
   async login(data: LoginDTO): Promise<LoginResponse> {
     const user = await this.repo.findByEmail(data.email);
     if (!user) {
-      throw new Error("Email hoặc mật khẩu không đúng");
+      throw AppError.unauthorized(
+        "Email hoặc mật khẩu không đúng",
+        "INVALID_CREDENTIALSl"
+      );
     }
+    //Kiểm tra tài khoản có bị xóa không
+    if (user.isDelete) {
+      throw AppError.notFound("Tài khoản không tồn tại");
+    }
+    //Kiểm tra tài khoản đã xác thực email chưa
+    if (!user.isVerify) {
+      throw AppError.unauthorized(
+        "Vui lòng xác thực email trước khi đăng nhập"
+      );
+    }
+    //Kiểm tra mật khẩu
     const isValidPassword = await verifyPassword(
       data.password,
       user.hashPassword
     );
 
     if (!isValidPassword) {
-      throw new Error("Email hoặc mật khẩu không đúng");
+      throw AppError.unauthorized("Email hoặc mật khẩu không đúng");
     }
     //Token thập
     const { accessToken, refreshToken } =

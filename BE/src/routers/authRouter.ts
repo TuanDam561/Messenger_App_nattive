@@ -12,7 +12,9 @@ import { PrismaTokenRepository } from "@repository/tokenRepository";
 import { TokenService } from "@services/tokenServices";
 import { JwtProvider } from "@providers/jwtProvider";
 
+// ===== Validate Data MiddleWare =====
 import { validateRegisterDTO } from "@middlewares/ValidateDataMiddleWare/validateRegister";
+import { validateLoginDTO } from "@middlewares/ValidateDataMiddleWare/validateLogin";
 
 //Khởi tạo router
 const authRouter = Router();
@@ -41,6 +43,6 @@ const authService = new AuthService(
 const authController = new AuthController(authService);
 //router
 authRouter.post("/register", validateRegisterDTO, authController.register);
-authRouter.post("/login", authController.login);
+authRouter.post("/login", validateLoginDTO, authController.login);
 
 export default authRouter;
