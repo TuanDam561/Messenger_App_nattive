@@ -40,9 +40,10 @@ const authService = new AuthService(
   tokenService,
   verifyMailService
 );
-const authController = new AuthController(authService);
+const authController = new AuthController(authService, verifyMailService);
 //router
 authRouter.post("/register", validateRegisterDTO, authController.register);
 authRouter.post("/login", validateLoginDTO, authController.login);
+authRouter.post("/verify-email", authController.verifyEmail);
 
 export default authRouter;
