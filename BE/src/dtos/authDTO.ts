@@ -11,3 +11,12 @@ export interface LoginDTO {
   email: string;
   password: string;
 }
+
+export interface ForgorPasswordDTO {
+  email: string;
+}
+export interface ResetPasswordDTO {
+  email: string;
+  verifyCode: string;
+  newPassword: string;
+}

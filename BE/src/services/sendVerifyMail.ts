@@ -1,7 +1,10 @@
-import crypto from "crypto";
+import { IAuthService } from "@interfaces/Auth/IAuthService";
 import { VerifyMailRepository } from "@interfaces/Mail/IMailRepository";
+import { SendVerifyMailResult } from "@dtos/mailDTO";
 import { MailProvider } from "@interfaces/Mail/IMailProvider";
 import { mailTemplates, MailTemplateType } from "@templates/indexTemples";
+import { generateOtp } from "@utils/randomCode";
+import { IAuthRepository } from "@interfaces/Auth/IAuthRepository ";
 
 interface SendVerifyMailParams {
   userId: string;
@@ -17,20 +20,36 @@ interface VerifyCodeParams {
 export class VerifyMailService {
   constructor(
     private verifyMailRepo: VerifyMailRepository,
-    private mailProvider: MailProvider
+    private mailProvider: MailProvider,
+    private authService: IAuthService,
+    private userRepo: IAuthRepository
   ) {}
 
   /**
    * Gửi mail OTP (REGISTER / RESET_PASSWORD)
    */
-  async sendVerifyMail(params: SendVerifyMailParams): Promise<void> {
+  async sendVerifyMail(
+    params: SendVerifyMailParams
+  ): Promise<SendVerifyMailResult> {
+    let userId = params.userId;
+
+    // 👉 Nếu không có userId thì tìm bằng email
+    if (!userId) {
+      const user = await this.userRepo.findByEmail(params.email);
+
+      if (!user) {
+        throw new Error("Không tìm thấy người dùng với email này");
+      }
+
+      userId = user.userId;
+    }
+
     // 1️⃣ Sinh OTP 6 số
-    const code = crypto.randomInt(100000, 999999).toString();
-    const expiredAt = new Date(Date.now() + 5 * 60 * 1000);
+    const { code, expiredAt } = generateOtp(6, 5);
 
     // 2️⃣ Lưu OTP vào DB
-    await this.verifyMailRepo.create({
-      userID: params.userId,
+    const verifyRecord = await this.verifyMailRepo.create({
+      userID: userId || params.userId,
       content: params.content,
       verifyCode: code,
       expiredAt,
@@ -42,6 +61,7 @@ export class VerifyMailService {
     const subjectMap: Record<MailTemplateType, string> = {
       REGISTER: "Xác thực đăng ký tài khoản",
       RESET_PASSWORD: "Xác thực đặt lại mật khẩu",
+      RE_SEND_CODE: "Mã xác thực của bạn",
     };
 
     // 4️⃣ Gửi mail
@@ -50,6 +70,7 @@ export class VerifyMailService {
       subject: subjectMap[params.content],
       html,
     });
+    return { userId: verifyRecord.userId, expiredAt: verifyRecord.expiredAt };
   }
 
   /**
@@ -68,7 +89,10 @@ export class VerifyMailService {
 
     // 2️⃣ Đánh dấu OTP đã dùng
     await this.verifyMailRepo.markUsed(verifyRecord.codeId);
-
+    // 3️⃣ Cập nhật trạng thái đã xác thực cho user (nếu là mail đăng ký)
+    if (verifyRecord.content === "REGISTER") {
+      await this.authService.verifyUser(params.userId);
+    }
     return true;
   }
 }

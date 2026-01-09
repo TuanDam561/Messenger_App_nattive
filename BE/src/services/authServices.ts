@@ -1,16 +1,15 @@
 import { RegisterDTO, LoginDTO } from "@dtos/authDTO";
+import { IAuthService } from "@interfaces/Auth/IAuthService";
 import { RegisterResponse, LoginResponse } from "@app_types/authTypes";
 import { hashPassword, verifyPassword } from "@utils/hashPassword";
 import { IAuthRepository } from "@interfaces/Auth/IAuthRepository ";
 import { ITokenService } from "@interfaces/Token/ITokenService";
-import { VerifyMailService } from "@services/sendVerifyMail";
 import { AppError } from "@shared/appError";
 
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
     private readonly repo: IAuthRepository,
-    private readonly tokenService: ITokenService,
-    private readonly verifyMailService: VerifyMailService
+    private readonly tokenService: ITokenService
   ) {}
   //Đăng ký
   async register(data: RegisterDTO): Promise<RegisterResponse> {
@@ -23,19 +22,6 @@ export class AuthService {
       ...data,
       hashPassword: await hashPassword(data.password),
     });
-
-    //Gửi mail xác thực đăng ký
-
-    try {
-      await this.verifyMailService.sendVerifyMail({
-        userId: user.userId,
-        email: user.gmail,
-        content: "REGISTER",
-      });
-    } catch (err) {
-      console.error("❌ Lỗi gửi mail xác thực:", err);
-      throw err;
-    }
 
     //Response gửi về client
     return {
@@ -94,4 +80,20 @@ export class AuthService {
     };
   }
   // Verify User
+  async verifyUser(userId: string): Promise<void> {
+    const user = await this.repo.findByID(userId);
+    if (!user) {
+      throw AppError.notFound("Người dùng không tồn tại");
+    }
+    await this.repo.updateVerifyUser({ isVerify: true }, userId);
+  }
+  //Đổi password
+  async changePassword(userId: string, newPassword: string): Promise<void> {
+    const user = await this.repo.findByID(userId);
+    if (!user) {
+      throw AppError.notFound("Người dùng không tồn tại");
+    }
+    const hashedPassword = await hashPassword(newPassword);
+    await this.repo.updatePassword(hashedPassword, userId);
+  }
 }

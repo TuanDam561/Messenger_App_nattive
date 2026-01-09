@@ -29,21 +29,25 @@ const mailProvider = new NodemailerMailProvider();
 const jwtProvider = new JwtProvider();
 
 //Khởi tạo Service
-const verifyMailService = new VerifyMailService(
-  verifyMailRepository,
-  mailProvider
-);
+
 const tokenService = new TokenService(tokenRepository, jwtProvider);
 
-const authService = new AuthService(
-  authRepository,
-  tokenService,
-  verifyMailService
+const authService = new AuthService(authRepository, tokenService);
+
+const verifyMailService = new VerifyMailService(
+  verifyMailRepository,
+  mailProvider,
+  authService,
+  authRepository
 );
+
 const authController = new AuthController(authService, verifyMailService);
 //router
 authRouter.post("/register", validateRegisterDTO, authController.register);
 authRouter.post("/login", validateLoginDTO, authController.login);
 authRouter.post("/verify-email", authController.verifyEmail);
+authRouter.post("/resend-code-verify", authController.resendCodeVerify);
+authRouter.post("/reset-password", authController.sendMailForgotPassword);
+authRouter.post("/change-password", authController.changePassWord);
 
 export default authRouter;
