@@ -4,7 +4,7 @@ import { RegisterDTO } from "@dtos/authDTO";
 
 export function validateRegisterDTO(
   req: Request,
-  res: Response,
+  _res: Response, //Khai báo để tránh lỗi unused variable
   next: NextFunction
 ) {
   const body = req.body as Partial<RegisterDTO>;

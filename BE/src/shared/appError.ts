@@ -1,6 +1,6 @@
 export class AppError extends Error {
   public statusCode: number;
-  public errorCode?: string;
+  public errorCode?: string | undefined;
 
   constructor(message: string, statusCode = 400, errorCode?: string) {
     super(message);

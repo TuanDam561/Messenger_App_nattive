@@ -1,23 +1,65 @@
 // {
 //   "compilerOptions": {
+//     "target": "ES2023",
 //     "module": "ESNext",
 //     "moduleResolution": "node",
-//     "target": "ES2023",
 //     "strict": true,
 //     "esModuleInterop": true,
-//     "ignoreDeprecations": "5.0"
+//     "ignoreDeprecations": "5.0",
+
+//     "baseUrl": "./src",
+//     "paths": {
+//       "@prisma/*": ["../generated/prisma/*"],
+//       "@configs/*": ["configs/*"],
+//       "@controllers/*": ["controllers/*"],
+//       "@dtos/*": ["dtos/*"],
+//       "@interfaces/*": ["interface/*"],
+//       "@middlewares/*": ["middlewares/*"],
+//       "@modules/*": ["modules/*"],
+//       "@providers/*": ["providers/*"],
+//       "@repository/*": ["repository/*"],
+//       "@routers/*": ["routers/*"],
+//       "@services/*": ["services/*"],
+//       "@shared/*": ["shared/*"],
+//       "@templates/*": ["templates/*"],
+//       "@utils/*": ["utils/*"],
+//       "@app_types/*": ["types/*"]
+//     }
 //   }
 // }
 
 {
   "compilerOptions": {
+    /* ===== Target & Module ===== */
     "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "node",
-    "strict": true,
-    "esModuleInterop": true,
-    "ignoreDeprecations": "5.0",
 
+    /* ===== Strictness ===== */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
+
+    /* ===== Code quality ===== */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+
+    /* ===== Safety ===== */
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* ===== Build behavior ===== */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+
+    /* ===== Path alias ===== */
     "baseUrl": "./src",
     "paths": {
       "@prisma/*": ["../generated/prisma/*"],
@@ -36,5 +78,8 @@
       "@utils/*": ["utils/*"],
       "@app_types/*": ["types/*"]
     }
-  }
+  },
+
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

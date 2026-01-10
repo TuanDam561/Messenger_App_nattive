@@ -4,7 +4,7 @@ import { LoginDTO } from "@dtos/authDTO";
 
 export function validateLoginDTO(
   req: Request,
-  res: Response,
+  _res: Response, //Khai báo để tránh lỗi không sài biến
   next: NextFunction
 ) {
   const body = req.body as Partial<LoginDTO>;
