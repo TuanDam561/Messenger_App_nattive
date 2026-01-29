@@ -29,6 +29,8 @@ model User {
   createdAt    DateTime                   @default(now()) @map("Create_Date")
   updatedAt    DateTime                   @updatedAt @map("Update_Date")
   isVerify     Boolean                    @default(false) @map("IsVerify")
+  avatarURL    String?                    @map("Avatar")
+  bannerURL    String?                    @map("Banner")
   
   // Relations
   conversationsAsFirst    Conversation[]  @relation("UserAsFirst")
